@@ -35,7 +35,6 @@ jobs:
         
   deploy:
     needs: build
-    if: (jobs.build.status == 'success')
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
