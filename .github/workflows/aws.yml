@@ -71,12 +71,10 @@ jobs:
     - name: AWS Lambda Deploy
       uses: appleboy/lambda-action@master
       env:
-        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-        ECR_REPOSITORY: vacinow-backend
-        IMAGE_TAG: ${{ github.sha }}
+        IMAGE_URI: ${{ secrets.ECR_REGISTRY }}/vacinow-backend:${{ github.sha }}
       with:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws_region: ${{ secrets.AWS_REGION }}
         function_name: vacinow-backend
-        image_uri: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        image_uri: ${{ env.IMAGE_URI }}
