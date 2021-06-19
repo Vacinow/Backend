@@ -5,7 +5,7 @@ on:
 name: Release
 
 jobs:
-  build:
+  tests:
     name: Tests
     runs-on: ubuntu-latest
 
@@ -28,13 +28,9 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    
-    # - name: Test with pytest
-    #   run: |
-    #     pytest
         
   deploy:
-    needs: build
+    needs: tests
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
@@ -61,9 +57,6 @@ jobs:
         ECR_REPOSITORY: vacinow-backend
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
