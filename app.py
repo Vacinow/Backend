@@ -8,7 +8,7 @@ from botocore.exceptions import ClientError
 
 import logging
 
-BUCKET_NAME = 'vacinow'
+BUCKET_NAME = 'vacinowbucket'
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -29,14 +29,29 @@ async def root():
 
 @app.post("/readfile/")
 async def readfile(image: UploadFile = Form(...)):
+
     # Upload the file
     file_id = str(uuid.uuid4())
-    s3 = boto3.client('s3')
+    s3 = boto3.client('s3', region_name = 'us-east-1')
     try:
         s3.upload_fileobj(image.file, BUCKET_NAME, file_id)        
     except ClientError as e:
         logger.error(e)
         raise HTTPException(status_code=500, detail="Can't process image")
-    return {"filename": str(image.filename)}
+    
+    # Reading text
+    textract = boto3.client('textract', region_name = 'us-east-1')
+    response = textract.detect_document_text(
+    Document={
+        'S3Object': {
+            'Bucket': BUCKET_NAME,
+            'Name': file_id
+        }
+    })
+    text = ''
+    for item in response["Blocks"]:
+        if item["BlockType"] == "LINE":
+            text += (item["Text"] + '\n')
+    return {"text": text}
 
 handler = Mangum(app=app)
