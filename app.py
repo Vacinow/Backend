@@ -39,6 +39,7 @@ def readfile(image: UploadFile = Form(...)):
     # Reading text
     textract = boto3.client('textract', region_name = 'us-east-1')
     logger.info('connected to textract')
+    logger.info(file_id)
     response = textract.detect_document_text(
     Document={
         'S3Object': {
