@@ -19,11 +19,11 @@ middleware = [Middleware(CORSMiddleware, allow_origins=['*'], allow_credentials=
 app = FastAPI(middleware=middleware)
 
 @app.get("/")
-async def root():
+def root():
     return {"message": "Hello World"}
 
 @app.post("/readfile/")
-async def readfile(image: UploadFile = Form(...)):
+def readfile(image: UploadFile = Form(...)):
     # Upload the file
     file_format = image.filename.split('.')[-1]
     file_id = str(uuid.uuid4())+'.'+file_format
