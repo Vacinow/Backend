@@ -10,6 +10,7 @@ mangum==0.11.0
 pydantic==1.8.2
 python-dateutil==2.8.1
 python-dotenv==0.17.1
+python-multipart==0.0.5
 PyYAML==5.4.1
 s3transfer==0.4.2
 six==1.16.0
