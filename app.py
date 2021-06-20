@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, UploadFile, Form
+from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 import uuid
@@ -13,15 +14,9 @@ BUCKET_NAME = 'vacinowbucket'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+middleware = [Middleware(CORSMiddleware, allow_origins=['*'], allow_credentials=True, allow_methods=['*'], allow_headers=['*'])]
+app = FastAPI(middleware=middleware)
 
 @app.get("/")
 async def root():
@@ -29,9 +24,9 @@ async def root():
 
 @app.post("/readfile/")
 async def readfile(image: UploadFile = Form(...)):
-
     # Upload the file
-    file_id = str(uuid.uuid4())
+    file_format = image.filename.split('.')[-1]
+    file_id = str(uuid.uuid4())+'.'+file_format
     s3 = boto3.client('s3', region_name = 'us-east-1')
     logger.info('connected to s3')
     try:
