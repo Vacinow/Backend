@@ -19,33 +19,30 @@ middleware = [Middleware(CORSMiddleware, allow_origins=['*'], allow_credentials=
 app = FastAPI(middleware=middleware)
 
 @app.get("/")
-def root():
+async def root():
     return {"message": "Hello World"}
 
 @app.post("/readfile/")
-def readfile(image: UploadFile = Form(...)):
-    # Upload the file
-    file_format = image.filename.split('.')[-1]
-    file_id = str(uuid.uuid4())+'.'+file_format
-    s3 = boto3.client('s3', region_name = 'us-east-1')
-    logger.info('connected to s3')
-    try:
-        s3.upload_fileobj(image.file, BUCKET_NAME, file_id) 
-        logger.info('uploaded')       
-    except ClientError as e:
-        logger.error(e)
-        raise HTTPException(status_code=500, detail="Can't process image")
+async def readfile(image: UploadFile = Form(...)):
+    # # Upload the file
+    # file_format = image.filename.split('.')[-1]
+    # file_id = str(uuid.uuid4())+'.'+file_format
+    # s3 = boto3.client('s3', region_name = 'us-east-1')
+    # logger.info('connected to s3')
+    # try:
+    #     s3.upload_fileobj(image.file, BUCKET_NAME, file_id) 
+    #     logger.info('uploaded')       
+    # except ClientError as e:
+    #     logger.error(e)
+    #     raise HTTPException(status_code=500, detail="Can't process image")
     
     # Reading text
     textract = boto3.client('textract', region_name = 'us-east-1')
     logger.info('connected to textract')
-    logger.info(file_id)
+    #logger.info(file_id)
     response = textract.detect_document_text(
     Document={
-        'S3Object': {
-            'Bucket': BUCKET_NAME,
-            'Name': file_id
-        }
+        'Bytes': image.file.read()
     })
     text = ''
     for item in response["Blocks"]:
