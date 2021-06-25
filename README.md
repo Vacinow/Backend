@@ -1,4 +1,7 @@
 # Backend
+
+PAra rodar faça:
+
 ```bash
-uvicorn app:app
+docker-compose up --build
 ```
