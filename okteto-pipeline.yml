@@ -1,3 +1,0 @@
-deploy:
-  - okteto build -t okteto.dev/vacinow-backend:latest
-  - kubectl apply -f k8s
