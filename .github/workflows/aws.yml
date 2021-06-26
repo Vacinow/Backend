@@ -55,11 +55,10 @@ jobs:
       env:
         ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
         ECR_REPOSITORY: vacinow-backend
-        IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:latest"
   
   deploy:
     needs: build
@@ -79,10 +78,9 @@ jobs:
           docker stop vacinow-backend -t 0 || true
           docker container prune -f
           docker image prune -af
-          echo $ECR_REGISTRY
           aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin $ECR_REGISTRY
-          docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker run -v ~/.aws:~/.aws --name vacinow-backend --restart unless-stopped -p 8000:8000 -d $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker pull $ECR_REGISTRY/vacinow-backend:latest
+          docker run -v ~/.aws:~/.aws --name vacinow-backend --restart unless-stopped -p 8000:8000 -d $ECR_REGISTRY/vacinow-backend:latest
           
 
     
