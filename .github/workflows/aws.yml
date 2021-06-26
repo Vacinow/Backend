@@ -75,6 +75,13 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         port: ${{ secrets.PORT }}
-        script: echo oi
+        script: |
+          docker stop vacinow-backend -t 0 || true
+          docker container prune -f
+          docker image prune -af
+          aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin $ECR_REGISTRY
+          docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker run -v ~/.aws:~/.aws --name vacinow-backend --restart unless-stopped -p 8000:8000 -d $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          
 
     
