@@ -77,12 +77,12 @@ jobs:
         key: ${{ secrets.KEY }}
         port: ${{ secrets.PORT }}
         script: |
-          export $(cat ~/.env | xargs -0)
+          export $(xargs < .env)
           docker stop vacinow-backend -t 0 || true
           docker container prune -f
           docker image prune -af
           docker pull vacinow/backend:latest
-          docker run -v ~/.aws:~/.aws --name vacinow-backend --restart unless-stopped -p 8000:8000 -d vacinow/backend:latest
+          docker run ~/.aws:/root/.aws:ro --name vacinow-backend --restart unless-stopped -p 8000:8000 -d vacinow/backend:latest
           
 
     
