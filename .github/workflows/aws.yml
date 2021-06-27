@@ -82,7 +82,7 @@ jobs:
           docker container prune -f
           docker image prune -af
           docker pull vacinow/backend:latest
-          docker run ~/.aws:/root/.aws:ro --name vacinow-backend --restart unless-stopped -p 8000:8000 -d vacinow/backend:latest
+          docker run -v ~/.aws:/root/.aws:ro --name vacinow-backend --restart unless-stopped -p 8000:8000 -d vacinow/backend:latest
           
 
     
