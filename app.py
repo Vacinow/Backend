@@ -26,7 +26,7 @@ async def root():
 @app.post("/readfile/")
 async def readfile(image: UploadFile = Form(...)):
 
-    textract = boto3.client('textract', region_name = 'us-east-1')
+    textract = boto3.client('textract')
     logger.info('connected to textract')
     response = textract.detect_document_text(
     Document={
