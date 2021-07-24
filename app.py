@@ -56,12 +56,10 @@ async def readfile(image: UploadFile = Form(...)):
         for j in range(len(KEY_WORDS)):
             n = j+1 if j+1 < len(KEY_WORDS) else 0
             if i == DEFAULT_SIZE-1 and n == 0:
-                print("ultima linha")
-                result = re.search(KEY_WORDS[j][0] + '(.*?)', text)
+                result = re.search(KEY_WORDS[j][0] + '(.*)', text)
             else:
                 result = re.search(KEY_WORDS[j][0] + '(.*?)' + KEY_WORDS[n][0], text)
             text = text[len(KEY_WORDS[j][0] + result.group(1)):]
-            print(text)
             tmp[KEY_WORDS[j][1]] = result.group(1).lstrip().rstrip()
         data.append(tmp)
 
