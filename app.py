@@ -38,18 +38,16 @@ async def root():
 async def readfile(image: UploadFile = Form(...)):
 
 
-    # textract = boto3.client('textract')
-    # logger.info('connected to textract')
-    # response = textract.detect_document_text(
-    # Document={
-    #     'Bytes': image.file.read()
-    # })
-    # text = ''
-    # for item in response["Blocks"]:
-    #     if item["BlockType"] == "WORD":
-    #         text += (' ' + item["Text"])
-    
-    text = "Nome Paulo Freire Idade 32 CPF 123.567.438-775 Data aplicação 24/06/21 Nome da vacina facare' Serviço de Saúde 123 Local de aplicação Goiania Laboratório 4 Lote 3 Nome Idade CPF Data aplicação Nome da vacina Serviço de Saúde Local de aplicação Laboratório Lote Nome Idade CPF Data aplicação Nome da vacina Serviço de Saúde Local de aplicação Laboratório Lote Nome Idade CPF Data aplicação Nome da vacina Serviço de Saúde Local de aplicação Laboratório Lote Nome Idade CPF Data aplicação Nome da vacina Serviço de Saúde Local de aplicação Laboratório Lote Nome Idade CPF Data aplicação Nome da vacina Serviço de Saúde Local de aplicação Laboratório Lote Nome Idade CPF Data aplicação Nome da vacina Serviço de Saúde Local de aplicação Laboratório Lote Nome Idade CPF Data aplicação Nome da vacina Serviço de Saúde Local de aplicação Laboratório Lote Nome Idade CPF Data aplicação Nome da vacina Serviço de Saúde Local de aplicação Laboratório Lote Nome Idade CPF Data aplicação Nome da vacina Serviço de Saúde Local de aplicação Laboratório Lote Nome Idade CPF Data aplicação Nome da vacina Serviço de Saúde Local de aplicação Laboratório Lote"
+    textract = boto3.client('textract')
+    logger.info('connected to textract')
+    response = textract.detect_document_text(
+    Document={
+        'Bytes': image.file.read()
+    })
+    text = ''
+    for item in response["Blocks"]:
+        if item["BlockType"] == "WORD":
+            text += (' ' + item["Text"])
 
     data = []
 
