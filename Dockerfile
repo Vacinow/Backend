@@ -1,10 +1,7 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.9
+FROM python:3.8-slim-buster
 
 EXPOSE 8000
-
-# Install psycopg2 dependencies
-RUN sudo apt install gcc python3-dev libpq-dev -y
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
