@@ -1,15 +1,16 @@
-from fastapi import FastAPI, HTTPException, UploadFile, Form, status
+import json
+import logging
+import re
+import os
 
 import boto3
 from botocore.exceptions import ClientError
+from fastapi import FastAPI, Form, HTTPException, UploadFile, Request
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from starlette.status import HTTP_406_NOT_ACCEPTABLE, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_503_SERVICE_UNAVAILABLE
 
-import logging
-import json
-import re
-
-from starlette.requests import Request
-
-from models import Pessoa, Vacina, Endereco
+from models import Endereco, Pessoa, Vacina
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -30,42 +31,98 @@ DEFAULT_SIZE = 11
 
 app = FastAPI()
 
+def db_connect():
+    CONNECTION_STRING = "{drivername}://{user}:{passwd}@{host}:{port}/{db_name}".format(
+                        drivername=os.environ.get("DB_ENGINE"), 
+                        user=os.environ.get("DB_USERNAME"), 
+                        passwd=os.environ.get("DB_PASSWORD"), 
+                        host=os.environ.get("DB_HOST"), 
+                        port=os.environ.get("DB_PORT"), 
+                        db_name=os.environ.get("DB_DATABASE"),
+                        )
+    return create_engine(CONNECTION_STRING, echo=False)
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
 @app.post("/readfile/")
 async def readfile(image: UploadFile = Form(...)):
+    try:
+        textract = boto3.client('textract')
+        logger.info('connected to textract')
+        response = textract.detect_document_text(
+        Document={
+            'Bytes': image.file.read()
+        })
+        text = ''
+        for item in response["Blocks"]:
+            if item["BlockType"] == "WORD":
+                text += (' ' + item["Text"])
 
+    except Exception as ex:
+        logger.error(ex)
+        raise HTTPException(status_code=HTTP_503_SERVICE_UNAVAILABLE, detail="O serviço de OCR não está disponível!")
 
-    textract = boto3.client('textract')
-    logger.info('connected to textract')
-    response = textract.detect_document_text(
-    Document={
-        'Bytes': image.file.read()
-    })
-    text = ''
-    for item in response["Blocks"]:
-        if item["BlockType"] == "WORD":
-            text += (' ' + item["Text"])
+    try:
+        data = []
 
-    data = []
+        for i in range(DEFAULT_SIZE):
+            tmp = {}
+            for j in range(len(KEY_WORDS)):
+                n = j+1 if j+1 < len(KEY_WORDS) else 0
+                if i == DEFAULT_SIZE-1 and n == 0:
+                    result = re.search(KEY_WORDS[j][0] + '(.*)', text)
+                else:
+                    result = re.search(KEY_WORDS[j][0] + '(.*?)' + KEY_WORDS[n][0], text)
+                text = text[len(KEY_WORDS[j][0] + result.group(1)):]
+                tmp[KEY_WORDS[j][1]] = result.group(1).lstrip().rstrip()
+            data.append(tmp)
+        return data
 
-    for i in range(DEFAULT_SIZE):
-        tmp = {}
-        for j in range(len(KEY_WORDS)):
-            n = j+1 if j+1 < len(KEY_WORDS) else 0
-            if i == DEFAULT_SIZE-1 and n == 0:
-                result = re.search(KEY_WORDS[j][0] + '(.*)', text)
-            else:
-                result = re.search(KEY_WORDS[j][0] + '(.*?)' + KEY_WORDS[n][0], text)
-            text = text[len(KEY_WORDS[j][0] + result.group(1)):]
-            tmp[KEY_WORDS[j][1]] = result.group(1).lstrip().rstrip()
-        data.append(tmp)
-
-    return data
+    except Exception as ex:
+        logger.error(ex)
+        raise HTTPException(status_code=HTTP_406_NOT_ACCEPTABLE, detail="O formato do formulário não é compatível!")
 
 @app.post("/formsubmit/")
 async def formsubmit(request: Request):
+
     data = json.loads(await request.body())
-    return data
+
+    try:
+        engine = db_connect()
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        ## Base.metadata.create_all(engine)
+    except Exception as ex:
+        logger.error(ex)
+        raise HTTPException(status_code=HTTP_503_SERVICE_UNAVAILABLE, detail="Problema ao conectar com base de dados!")
+
+    try:
+        for cadastro in data:
+            vacinado = Pessoa(
+                nome=cadastro.get('name'),
+                idade=int(cadastro.get('age')),
+                cpf=int(cadastro.get('cpf')),
+                cns=int(cadastro.get('nsus')),
+            )
+            session.add(vacinado)
+            vacina = Vacina(
+                data_de_aplicacao=cadastro.get('date'),
+                tipo=cadastro.get('lab'),
+                nome=cadastro.get('vaccine'),
+                lote=int(cadastro.get('batch')),
+                unidade=cadastro.get('place'),
+                pessoa=vacinado
+            )
+            session.add(vacina)
+            session.commit()
+        
+        session.close()
+        return data
+
+    except Exception as ex:
+        logger.error(ex)
+        session.rollback()
+        session.close()
+        raise HTTPException(status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Problema ao salvar na base de dados!") 

@@ -1,9 +1,8 @@
 from sqlalchemy import create_engine, Column, Table, ForeignKey, MetaData
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import (Integer, String, Date, DateTime, Float, Boolean, Text)
+from sqlalchemy import (BigInteger, Integer, String, Date, DateTime, Float, Boolean, Text)
 from sqlalchemy.sql.schema import CheckConstraint
-import os
 import logging
 
 Base = declarative_base()
@@ -11,28 +10,14 @@ Base = declarative_base()
 logging.basicConfig()
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
-def db_connect():
-    CONNECTION_STRING = "{drivername}://{user}:{passwd}@{host}:{port}/{db_name}".format(
-                        drivername=os.environ.get("DB_ENGINE"), 
-                        user=os.environ.get("DB_USERNAME"), 
-                        passwd=os.environ.get("DB_PASSWORD"), 
-                        host=os.environ.get("DB_HOST"), 
-                        port=os.environ.get("DB_PORT"), 
-                        db_name=os.environ.get("DB_DATABASE"),
-                        )
-    return create_engine(CONNECTION_STRING, echo=False)
-
-def create_table(engine):
-    Base.metadata.create_all(engine)
-
 class Pessoa(Base):
     __tablename__ = 'pessoa'
     __table_args__ = tuple([CheckConstraint("sexo in ('M', 'F')")])
 
-    cpf = Column(Integer, nullable=False, primary_key=True, autoincrement=False)
-    cns = Column(Integer, nullable=True, unique=True)
+    cpf = Column(BigInteger, nullable=False, primary_key=True, autoincrement=False)
+    cns = Column(BigInteger, nullable=True, unique=True)
     nome = Column(String(200), nullable=False)
-    data_nascimento = Column(Date, nullable=False)
+    idade = Column(Integer, nullable=True)
     telefone = Column(String(20), nullable=True)
     sexo = Column(String(1), nullable=True)
     etnia = Column(String(20), nullable=True)
@@ -49,15 +34,16 @@ class Vacina(Base):
 
     id = Column(Integer, primary_key=True)
     data_de_aplicacao = Column(Date, nullable=False)
+    nome = Column(String(50), nullable=True)
     tipo = Column(String(50), nullable=False)
     grupo_alvo = Column(Text, nullable=True)
-    lote = Column(Integer, nullable=False)
-    dose = Column(Integer, nullable=False)
-    vacinador = Column(String(100), nullable=False)
+    lote = Column(BigInteger, nullable=False)
+    dose = Column(Integer, nullable=True)
+    vacinador = Column(String(100), nullable=True)
     unidade = Column(String(100), nullable=False)
     
     pessoa = relationship('Pessoa', back_populates='vacina')
-    pessoa_cpf = Column(Integer, ForeignKey('pessoa.cpf', ondelete="CASCADE"))
+    pessoa_cpf = Column(BigInteger, ForeignKey('pessoa.cpf', ondelete="CASCADE"))
 
 
 class Endereco(Base):
@@ -74,4 +60,4 @@ class Endereco(Base):
     zona = Column(String(6), nullable=True)
 
     pessoa = relationship('Pessoa', back_populates='endereco')
-    pessoa_cpf = Column(Integer, ForeignKey('pessoa.cpf', ondelete="CASCADE"))
+    pessoa_cpf = Column(BigInteger, ForeignKey('pessoa.cpf', ondelete="CASCADE"))
