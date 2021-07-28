@@ -10,7 +10,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
-from starlette.status import HTTP_406_NOT_ACCEPTABLE, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_503_SERVICE_UNAVAILABLE
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_406_NOT_ACCEPTABLE, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_503_SERVICE_UNAVAILABLE
 
 from models import Endereco, Pessoa, Vacina
 
@@ -89,7 +89,11 @@ async def readfile(image: UploadFile = Form(...)):
 @app.post("/formsubmit/")
 async def formsubmit(request: Request):
 
-    data = json.loads(await request.body())
+    try:
+        data = json.loads(await request.body())
+    except Exception as ex:
+        logger.error(ex)
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Formato inválido!")
 
     try:
         engine = db_connect()
