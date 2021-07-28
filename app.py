@@ -8,6 +8,8 @@ from botocore.exceptions import ClientError
 from fastapi import FastAPI, Form, HTTPException, UploadFile, Request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
+from psycopg2.errors import UniqueViolation
 from starlette.status import HTTP_406_NOT_ACCEPTABLE, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_503_SERVICE_UNAVAILABLE
 
 from models import Endereco, Pessoa, Vacina
@@ -120,6 +122,16 @@ async def formsubmit(request: Request):
         session.commit()
         session.close()
         return data
+    
+    except IntegrityError as e:
+        logger.error(e)
+        session.rollback()
+        session.close()
+        if isinstance(e.orig, UniqueViolation):
+            violation = re.findall('\((.*?)\)', e.orig.diag.message_detail)
+            raise HTTPException(status_code=HTTP_406_NOT_ACCEPTABLE, detail=f'O {str(violation[0]).upper()} de número {str(violation[1])} já exite!')
+        else:
+            raise HTTPException(status_code=HTTP_406_NOT_ACCEPTABLE, detail="Problema ao salvar na base de dados!")
 
     except Exception as ex:
         logger.error(ex)
@@ -130,5 +142,5 @@ async def formsubmit(request: Request):
 @app.post("/vacivida/")
 async def vacivida(request: Request):
     data = json.loads(await request.body())
-    print(json.dumps(data))
+    print(json.dumps(data, indent=4, sort_keys=True))
     return data
