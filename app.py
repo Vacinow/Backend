@@ -116,8 +116,8 @@ async def formsubmit(request: Request):
                 pessoa=vacinado
             )
             session.add(vacina)
-            session.commit()
         
+        session.commit()
         session.close()
         return data
 
@@ -126,3 +126,9 @@ async def formsubmit(request: Request):
         session.rollback()
         session.close()
         raise HTTPException(status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Problema ao salvar na base de dados!") 
+
+@app.post("/vacivida/")
+async def vacivida(request: Request):
+    data = json.loads(await request.body())
+    print(json.dumps(data))
+    return data
