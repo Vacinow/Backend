@@ -38,13 +38,15 @@ docker-compose --env-file .env up --build
 
 ## 📝 Documentação
 
+A descrição da API está disponível em: https://api.vacinow.tk/docs.
+
 O diagrama da arquitetura da aplicação inteira pode ser vista a seguir:
 
 ![Arquitetura](./assets/arquitetura.png)
 
 O modelo de dados é um banco de dados PostgreSQL, cuja estrutura pode ser vista abaixo:
 
-![Estrutura do banco de dados](./assets/base_de_dados.png)]
+![Estrutura do banco de dados](./assets/base_de_dados.png)
 
 Por fim, o diagrama de classe do projeto do backend ficou como segue:
 
