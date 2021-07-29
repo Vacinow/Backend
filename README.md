@@ -1,8 +1,15 @@
+<p align="left">
+
+<img alt="GitHub issues" src="https://img.shields.io/github/issues-raw/Vacinow/Backend?style=for-the-badge">
+<img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/Vacinow/Backend/Release?style=for-the-badge">
+
+</p>
+
 # Backend
 
 ## 🌐 Aplicação remota
 
-Para acessar a aplicação rodando em ambiente de produção no servidor EC2 da Amazon, acesse o link: https://vacinow.tk/. E para acessar a API utilize o seguinte link: https://api.vacinow.tk/.
+Para acessar a aplicação completa rodando em ambiente de produção no servidor EC2 da Amazon, acesse o link: https://vacinow.tk/. E para acessar a API utilize o seguinte link: https://api.vacinow.tk/.
 
 ## 🏁 Rodando o projeto
 
