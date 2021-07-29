@@ -27,6 +27,14 @@ docker-compose --env-file .env up --build
 
 ## 📝 Documentação
 
-É possível ver a diagrama de classe do projeto a seguir:
+O diagrama da arquitetura da aplicação inteira pode ser vista a seguir:
+
+![Arquitetura](./assets/arquitetura.png)
+
+O modelo de dados é um banco de dados PostgreSQL, cuja estrutura pode ser vista abaixo:
+
+![Estrutura do banco de dados](./assets/base_de_dados.png)]
+
+Por fim, o diagrama de classe do projeto do backend ficou como segue:
 
 ![Diagrama de classe do projeto](./assets/diagrama_de_classes.png)
