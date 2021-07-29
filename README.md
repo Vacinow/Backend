@@ -18,7 +18,7 @@ DB_DATABASE=vacinow-db
 
 Pode-se colocar essas definições em um arquivo chamado `.env` e colocar o arquivo na raiz do projeto.
 
-Então, para rodar a aplicação com esse arquivo, é necessário executar na raiz do projeto o seguinte comando:
+Também é necessário possuir o [Docker](https://www.docker.com/) e [docker-compose](https://docs.docker.com/compose/) instalados. Então, para rodar a aplicação com esse arquivo, é necessário executar na raiz do projeto o seguinte comando:
 
 
 ```bash
