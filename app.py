@@ -91,6 +91,7 @@ async def formsubmit(request: Request):
 
     try:
         data = json.loads(await request.body())
+        logger.info(json.dumps(data, indent=4, sort_keys=True))
     except Exception as ex:
         logger.error(ex)
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Formato inválido!")
@@ -133,7 +134,7 @@ async def formsubmit(request: Request):
         session.close()
         if isinstance(e.orig, UniqueViolation):
             violation = re.findall('\((.*?)\)', e.orig.diag.message_detail)
-            raise HTTPException(status_code=HTTP_406_NOT_ACCEPTABLE, detail=f'O {str(violation[0]).upper()} de número {str(violation[1])} já exite!')
+            raise HTTPException(status_code=HTTP_406_NOT_ACCEPTABLE, detail=f'O {str(violation[0]).upper()} de número {str(violation[1])} já existe!')
         else:
             raise HTTPException(status_code=HTTP_406_NOT_ACCEPTABLE, detail="Problema ao salvar na base de dados!")
 
@@ -142,9 +143,3 @@ async def formsubmit(request: Request):
         session.rollback()
         session.close()
         raise HTTPException(status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Problema ao salvar na base de dados!") 
-
-@app.post("/vacivida/")
-async def vacivida(request: Request):
-    data = json.loads(await request.body())
-    print(json.dumps(data, indent=4, sort_keys=True))
-    return data
