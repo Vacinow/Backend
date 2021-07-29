@@ -27,6 +27,8 @@ DB_PORT=5432
 DB_DATABASE=vacinow-db
 ```
 
+Para utilizar o serviço da AWS, é necessário se ter uma conta e ter acesso ao serviço do [Textxract](https://aws.amazon.com/textract/).
+
 Pode-se colocar essas definições em um arquivo chamado `.env` e colocar o arquivo na raiz do projeto.
 
 Também é necessário possuir o [Docker](https://www.docker.com/) e [docker-compose](https://docs.docker.com/compose/) instalados. Então, para rodar a aplicação com esse arquivo, é necessário executar na raiz do projeto o seguinte comando:
