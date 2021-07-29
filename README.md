@@ -1,5 +1,9 @@
 # Backend
 
+## 🌐 Aplicação remota
+
+Para acessar a aplicação rodando em ambiente de produção no servidor EC2 da Amazon, acesse o link: https://vacinow.tk/. E para acessar a API utilize o seguinte link: https://api.vacinow.tk/.
+
 ## 🏁 Rodando o projeto
 
 Para rodar o projeto é necessário ter credenciais válidas pra a integração com a AWS e são necessárias algumas variáveis de ambiente. Dessa forma é definir as seguintes varávies de ambiente com os seguintes valores:
